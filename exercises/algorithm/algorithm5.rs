@@ -3,7 +3,6 @@
 	This problem requires you to implement a basic BFS algorithm
 */
 
-//I AM NOT DONE
 use std::collections::VecDeque;
 
 // Define a graph
@@ -31,6 +30,25 @@ impl Graph {
 		//TODO
 
         let mut visit_order = vec![];
+
+        let n = self.adj.len();
+        let mut visited = vec![false; n];
+        let mut queue = VecDeque::new();
+
+        // 标记 + 入队 + 记录
+        visited[start] = true;
+        queue.push_back(start);
+        visit_order.push(start);
+
+        while let Some(u) = queue.pop_front() {
+            for &v in &self.adj[u] {
+                if !visited[v] {
+                    visited[v] = true;       // 入队时就标记，防重复
+                    queue.push_back(v);
+                    visit_order.push(v);
+                }
+            }
+        }
         visit_order
     }
 }

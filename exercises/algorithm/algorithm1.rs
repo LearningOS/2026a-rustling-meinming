@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -69,14 +68,59 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+    pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self
+    where
+        T: Ord,
+    {
+        let mut a = list_a.start;
+        let mut b = list_b.start;
+        let mut head: Option<NonNull<Node<T>>> = None;
+        let mut tail: Option<NonNull<Node<T>>> = None;
+        let mut length: u32 = 0;
+
+        while a.is_some() || b.is_some() {
+            let take_a = match (a, b) { // a or b?
+                (Some(_), None) => true,
+                (None, Some(_)) => false,
+                (Some(pa), Some(pb)) => unsafe {
+                    (*pa.as_ptr()).val <= (*pb.as_ptr()).val
+                },
+                (None, None) => unreachable!(),
+            };
+
+            let node = if take_a {
+                let n = a.unwrap();
+                a = unsafe { (*n.as_ptr()).next };
+                n
+            } else {
+                let n = b.unwrap();
+                b = unsafe { (*n.as_ptr()).next };
+                n
+            };
+
+
+            unsafe { (*node.as_ptr()).next = None; }
+
+            match tail {
+                None => {
+                    head = Some(node);
+                    tail = Some(node);
+                }
+                Some(t) => {
+                    unsafe { (*t.as_ptr()).next = Some(node); }
+                    tail = Some(node);
+                }
+            }
+            length += 1;
         }
+
+        LinkedList { length, start: head, end: tail }
+		//TODO
+		// Self {
+        //     length: 0,
+        //     start: None,
+        //     end: None,
+        // }
 	}
 }
 
